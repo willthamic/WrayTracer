@@ -1,0 +1,10 @@
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Debug\WrayTrace.exe.config
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Debug\WrayTrace.exe
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Debug\WrayTrace.pdb
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Debug\Vector.dll
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Debug\Vector.pdb
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Debug\WrayTrace.csprojAssemblyReference.cache
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Debug\WrayTrace.csproj.CoreCompileInputs.cache
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Debug\WrayTrace.csproj.CopyComplete
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Debug\WrayTrace.exe
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Debug\WrayTrace.pdb
