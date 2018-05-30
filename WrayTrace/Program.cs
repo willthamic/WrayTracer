@@ -13,25 +13,45 @@ namespace WrayTrace
     {
         static void Main(string[] args)
         {
-            Bitmap image = new Bitmap(100, 100);
+            int temp = 500;
+            Bitmap bitmap = new Bitmap(temp, temp);
 
-            Vector3 a = new Vector3(-1, 1, 0);
+            Vector3 a = new Vector3(-1, 1, 0.3f);
             Vector3 b = new Vector3(-1, -1, 0);
             Vector3 c = new Vector3(1, -1, 0);
-
             Geometry.Rectangle border = new Geometry.Rectangle(a, b, c);
+            Sensor sensor = new Sensor(border, temp, temp);
+            Camera camera = new Camera(new Vector3(0, 0, 1),sensor);
 
-            Sensor sensor = new Sensor(border, 5, 5);
+            Vector3 a0 = new Vector3(-1, 1, -1);
+            Vector3 b0 = new Vector3(-1, -1, -1);
+            Vector3 c0 = new Vector3(1, -1, -1);
+            Geometry.Rectangle rect = new Geometry.Rectangle(a0, b0, c0);
 
-            Console.WriteLine(border.Normal().ToString());
+            for (var i = 0; i < temp; i++)
+            {
+                for (var j = 0; j < temp; j++)
+                {
+                    Vector3 impact = Vector3.RayCast(camera.location, camera.sensor.LocatePixel(i, j) - camera.location, rect.plane);
+                    if (Math.Abs(impact.x) <= 1 && Math.Abs(impact.y) <= 1)
+                    {
+                        bitmap.SetPixel(i, j, Color.Black);
+                    } else
+                    {
+                        bitmap.SetPixel(i, j, Color.White);
+                    }
+                }
+            }
+
+            bitmap.Save("img.bmp");
         }
     }
 
     class Camera
     {
-        Vector3 location;
+        public Vector3 location;
         //Vector3 direction;
-        Sensor sensor;
+        public Sensor sensor;
 
         public Camera (Vector3 location0, Sensor sensor0)
         {
