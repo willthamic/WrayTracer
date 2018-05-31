@@ -13,33 +13,29 @@ namespace WrayTrace
     {
         static void Main(string[] args)
         {
-            int temp = 500;
+            int temp = 1000;
             Bitmap bitmap = new Bitmap(temp, temp);
 
-            Vector3 a = new Vector3(-1, 1, 0.3f);
+            Vector3 a = new Vector3(-1, 1, 0);
             Vector3 b = new Vector3(-1, -1, 0);
             Vector3 c = new Vector3(1, -1, 0);
-            Geometry.Rectangle border = new Geometry.Rectangle(a, b, c);
+            Geometry.Parallelogram border = new Geometry.Parallelogram(a, b, c);
             Sensor sensor = new Sensor(border, temp, temp);
             Camera camera = new Camera(new Vector3(0, 0, 1),sensor);
 
-            Vector3 a0 = new Vector3(-1, 1, -1);
+            Vector3 a0 = new Vector3(-1, 1, -1.5f);
             Vector3 b0 = new Vector3(-1, -1, -1);
             Vector3 c0 = new Vector3(1, -1, -1);
-            Geometry.Rectangle rect = new Geometry.Rectangle(a0, b0, c0);
+            Geometry.Parallelogram rect = new Geometry.Parallelogram(a0, b0, c0);
 
             for (var i = 0; i < temp; i++)
             {
                 for (var j = 0; j < temp; j++)
                 {
-                    Vector3 impact = Vector3.RayCast(camera.location, camera.sensor.LocatePixel(i, j) - camera.location, rect.plane);
-                    if (Math.Abs(impact.x) <= 1 && Math.Abs(impact.y) <= 1)
-                    {
-                        bitmap.SetPixel(i, j, Color.Black);
-                    } else
-                    {
-                        bitmap.SetPixel(i, j, Color.White);
-                    }
+                    Vector3 intersect = rect.FindIntersect(camera.location, camera.sensor.LocatePixel(i, j) - camera.location);
+                    if (intersect != null)
+                        float intensity = Vector3.Dot(rect.plane.normal.Unit(), light - intersect);
+                        bitmap.SetPixel(i, j, Color.FromArgb(intensity,intensity,intensity));
                 }
             }
 
@@ -50,24 +46,22 @@ namespace WrayTrace
     class Camera
     {
         public Vector3 location;
-        //Vector3 direction;
         public Sensor sensor;
 
         public Camera (Vector3 location0, Sensor sensor0)
         {
             location = location0;
-            //direction = direction0;
             sensor = sensor0;
         }
     }
 
     class Sensor
     {
-        Geometry.Rectangle border;
+        Geometry.Parallelogram border;
         int pWidth;
         int pHeight;
 
-        public Sensor(Geometry.Rectangle border0, int pWidth0, int pHeight0)
+        public Sensor(Geometry.Parallelogram border0, int pWidth0, int pHeight0)
         {
             border = border0;
             pWidth = pWidth0;
@@ -80,6 +74,18 @@ namespace WrayTrace
             Vector3 ab = border.b - border.a;
             Vector3 ap = (ad / (pWidth - 1) * x) + (ab / (pHeight - 1) * y);
             return border.a + ap;
+        }
+    }
+
+    class Light
+    {
+        public Vector3 location;
+        public float intensity;
+
+        public Light(Vector3 location0, float intensity0)
+        {
+            location = location0;
+            intensity = intensity0;
         }
     }
 }
