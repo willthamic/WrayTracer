@@ -28,14 +28,18 @@ namespace WrayTrace
             Vector3 c0 = new Vector3(1, -1, -1);
             Geometry.Parallelogram rect = new Geometry.Parallelogram(a0, b0, c0);
 
+            Light light = new Light(new Vector3(0.5f, 0.5f, -0.5f), 200);
+
             for (var i = 0; i < temp; i++)
             {
                 for (var j = 0; j < temp; j++)
                 {
                     Vector3 intersect = rect.FindIntersect(camera.location, camera.sensor.LocatePixel(i, j) - camera.location);
                     if (intersect != null)
-                        float intensity = Vector3.Dot(rect.plane.normal.Unit(), light - intersect);
-                        bitmap.SetPixel(i, j, Color.FromArgb(intensity,intensity,intensity));
+                    {
+                        int intensity = Convert.ToInt32(Vector3.Dot(rect.plane.normal.Unit(), (light.location - intersect).Unit()) * light.intensity);
+                        bitmap.SetPixel(i, j, Color.FromArgb(intensity, intensity, intensity));
+                    }
                 }
             }
 
