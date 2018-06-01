@@ -8,3 +8,5 @@ C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Debug\WrayTrace.cspr
 C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Debug\WrayTrace.csproj.CopyComplete
 C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Debug\WrayTrace.exe
 C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Debug\WrayTrace.pdb
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Debug\System.ValueTuple.dll
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Debug\System.ValueTuple.xml

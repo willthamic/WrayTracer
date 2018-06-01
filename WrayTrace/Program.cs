@@ -13,38 +13,84 @@ namespace WrayTrace
     {
         static void Main(string[] args)
         {
-            int temp = 1000;
-            Bitmap bitmap = new Bitmap(temp, temp);
+            int width = 1920;
+            int height = 1080;
 
-            Vector3 a = new Vector3(-1, 1, 0);
-            Vector3 b = new Vector3(-1, -1, 0);
-            Vector3 c = new Vector3(1, -1, 0);
-            Geometry.Parallelogram border = new Geometry.Parallelogram(a, b, c);
-            Sensor sensor = new Sensor(border, temp, temp);
-            Camera camera = new Camera(new Vector3(0, 0, 1),sensor);
+            Bitmap bitmap = new Bitmap(width, height);
 
-            Vector3 a0 = new Vector3(-1, 1, -1.5f);
-            Vector3 b0 = new Vector3(-1, -1, -1);
-            Vector3 c0 = new Vector3(1, -1, -1);
-            Geometry.Parallelogram rect = new Geometry.Parallelogram(a0, b0, c0);
+            Parallelogram sensorBorder = new Parallelogram(V(-1.6f, 1, 0), V(-1.6f, -1, 0), V(1.6f, -1, 0));
+            Sensor sensor = new Sensor(sensorBorder, width, height);
+            Camera camera = new Camera(V(0, 0, 1), sensor);
 
-            Light light = new Light(new Vector3(0.5f, 0.5f, -0.5f), 200);
+            Parallelogram rect1 = new Parallelogram(V(-1.5f, 1.5f, -1.5f), V(-1.5f, -1.5f, -1), V(1.5f, -1.5f, -1));
+            Parallelogram rect2 = new Parallelogram(V(-.5f, .5f, -.7f), V(-.5f, -.5f, -.8f), V(.5f, -.5f, -.8f));
 
-            for (var i = 0; i < temp; i++)
+
+
+            Triangle[] elements = { rect1.A, rect1.B, rect2.A, rect2.B };
+
+
+            Light light = new Light(new Vector3(0.5f, 0.5f, 0f), 200);
+
+            for (var x = 0; x < width; x++)
             {
-                for (var j = 0; j < temp; j++)
+                for (var y = 0; y < height; y++)
                 {
-                    Line ray = new Line(camera.location, camera.sensor.LocatePixel(i, j) - camera.location);
-                    Vector3 intersect = rect.FindIntersect(ray);
-                    if (intersect != null)
+                    if (x == 400 && y == 400)
                     {
-                        int intensity = Convert.ToInt32(Vector3.Dot(rect.plane.normal.Unit(), (light.location - intersect).Unit()) * light.intensity);
-                        bitmap.SetPixel(i, j, Color.FromArgb(intensity, intensity, intensity));
+                        var asdasd = 0;
+                    }
+                    Line ray = new Line(camera.location, camera.sensor.LocatePixel(x, y) - camera.location);
+
+                    Triangle intersectedObject = null;
+                    Vector3 p = null;
+                    float minT = 0;
+
+                    bool flag = true;
+
+                    foreach (Triangle element in elements) {
+                        (bool, Vector3, float) intersect = element.FindIntersect(ray);
+
+                        if (intersect.Item1 && (flag || (intersect.Item3 < minT && intersect.Item3 > 0)))
+                        {
+                            flag = false;
+                            intersectedObject = element;
+                            p = intersect.Item2;
+                            minT = intersect.Item3;
+                        }
+                    }
+
+                    if (p != null)
+                    {
+                        bool clearpath = true;
+
+                        foreach (Triangle element in elements)
+                        {
+                            if (element == intersectedObject)
+                                continue;
+                            (bool, Vector3, float) intersect = element.FindIntersect(new Line(p, light.location - p));
+                            if (intersect.Item1 && intersect.Item3 > 0)
+                            {
+                                clearpath = false;
+                                break;
+                            }
+                        }
+
+                        if (clearpath)
+                        {
+                            int intensity = Convert.ToInt32(Vector3.Dot(intersectedObject.plane.normal.Unit(), (light.location - p).Unit()) * light.intensity);
+                            bitmap.SetPixel(x, y, Color.FromArgb(intensity, intensity, intensity));
+                        }
                     }
                 }
             }
 
             bitmap.Save("img.bmp");
+        }
+
+        static Vector3 V(float x0, float y0, float z0)
+        {
+            return new Vector3(x0, y0, z0);
         }
     }
 
