@@ -34,7 +34,8 @@ namespace WrayTrace
             {
                 for (var j = 0; j < temp; j++)
                 {
-                    Vector3 intersect = rect.FindIntersect(camera.location, camera.sensor.LocatePixel(i, j) - camera.location);
+                    Line ray = new Line(camera.location, camera.sensor.LocatePixel(i, j) - camera.location);
+                    Vector3 intersect = rect.FindIntersect(ray);
                     if (intersect != null)
                     {
                         int intensity = Convert.ToInt32(Vector3.Dot(rect.plane.normal.Unit(), (light.location - intersect).Unit()) * light.intensity);

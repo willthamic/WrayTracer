@@ -3,6 +3,9 @@ using Vector;
 
 namespace Geometry
 {
+    /// <summary>
+    /// Represents a parallelogram defined by three points in 3-dimensions.
+    /// </summary>
     public class Parallelogram
     {
         public Triangle A;
@@ -29,10 +32,13 @@ namespace Geometry
             plane = A.plane;
         }
 
-        public Vector3 FindIntersect(Vector3 o, Vector3 d)
+        /// <summary>
+        /// Finds the intersection of the parallelogram and a specified line.
+        /// </summary>
+        public Vector3 FindIntersect(Line line)
         {
-            Vector3 aIntersect = A.FindIntersect(o, d);
-            Vector3 bIntersect = B.FindIntersect(o, d);
+            Vector3 aIntersect = A.FindIntersect(line);
+            Vector3 bIntersect = B.FindIntersect(line);
             if (aIntersect != null)
                 return aIntersect;
             else if (bIntersect != null)
@@ -42,7 +48,10 @@ namespace Geometry
         }
     }
 
-    public class Triangle
+    /// <summary>
+    /// Represents a triangle defined by three points in 3-dimensions.
+    /// </summary>
+        public class Triangle
     {
         public Vector3 a;
         public Vector3 b;
@@ -57,9 +66,12 @@ namespace Geometry
             plane = new Plane(a, b - a, c - a);
         }
 
-        public Vector3 FindIntersect(Vector3 o, Vector3 d)
+        /// <summary>
+        /// Finds the intersection of the triangle and a specified line.
+        /// </summary>
+        public Vector3 FindIntersect(Line line)
         {
-            Vector3 p = Plane.RayCast(o, d, plane);
+            Vector3 p = Plane.RayCast(line, plane);
             if (p == null)
                 return null;
             float i = (float) Math.Acos(Vector3.Dot((a - p).Unit(), (b - p).Unit()));
