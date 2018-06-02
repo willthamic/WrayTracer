@@ -18,28 +18,33 @@ namespace WrayTrace
 
             Bitmap bitmap = new Bitmap(width, height);
 
-            Parallelogram sensorBorder = new Parallelogram(V(-1.6f, 1, 0), V(-1.6f, -1, 0), V(1.6f, -1, 0));
+            Parallelogram sensorBorder = new Parallelogram(V(-1, -4, 4), V(-1, -4, 2), V(1, -4, 2));
             Sensor sensor = new Sensor(sensorBorder, width, height);
-            Camera camera = new Camera(V(0, 0, 1), sensor);
+            //Camera camera2 = new Camera(V(0, -5, 3), sensor);
+            Camera camera = new Camera(V(2, -4, 4)*1.5f, V(-.5f,1,-.75f).Unit(), 1.2f, width, height);
 
-            Parallelogram rect1 = new Parallelogram(V(-1.5f, 1.5f, -1.5f), V(-1.5f, -1.5f, -1), V(1.5f, -1.5f, -1));
-            Parallelogram rect2 = new Parallelogram(V(-.5f, .5f, -.7f), V(-.5f, -.5f, -.8f), V(.5f, -.5f, -.8f));
+            //Parallelogram rect1 = new Parallelogram(V(-1.5f, 1.5f, -1.5f), V(-1.5f, -1.5f, -1), V(1.5f, -1.5f, -1));
+            //Parallelogram rect2 = new Parallelogram(V(-.5f, .5f, -.7f), V(-.5f, -.5f, -.8f), V(.5f, -.5f, -.8f));
 
+            Parallelogram floor = new Parallelogram(V(-10, 10, 0), V(-10, -10, 0), V(10, -10, 0));
+            Paralleloid cube = new Paralleloid(V(1, 1, 0), V(1, -1, 0), V(-1, 1, 0), V(1, 1, 2));
 
+            Triangle[] elements = {
+                floor.A, floor.B,
+                cube.faces[0].A, cube.faces[0].B,
+                cube.faces[1].A, cube.faces[1].B,
+                cube.faces[2].A, cube.faces[2].B,
+                cube.faces[3].A, cube.faces[3].B,
+                cube.faces[4].A, cube.faces[4].B,
+                cube.faces[5].A, cube.faces[5].B
+            };
 
-            Triangle[] elements = { rect1.A, rect1.B, rect2.A, rect2.B };
-
-
-            Light light = new Light(new Vector3(0.5f, 0.5f, 0f), 200);
+            Light light = new Light(new Vector3(10, -7, 15), 5000);
 
             for (var x = 0; x < width; x++)
             {
                 for (var y = 0; y < height; y++)
                 {
-                    if (x == 400 && y == 400)
-                    {
-                        var asdasd = 0;
-                    }
                     Line ray = new Line(camera.location, camera.sensor.LocatePixel(x, y) - camera.location);
 
                     Triangle intersectedObject = null;
@@ -51,7 +56,7 @@ namespace WrayTrace
                     foreach (Triangle element in elements) {
                         (bool, Vector3, float) intersect = element.FindIntersect(ray);
 
-                        if (intersect.Item1 && (flag || (intersect.Item3 < minT && intersect.Item3 > 0)))
+                        if (intersect.Item1 && ((flag || intersect.Item3 < minT) && intersect.Item3 > 0))
                         {
                             flag = false;
                             intersectedObject = element;
@@ -78,7 +83,7 @@ namespace WrayTrace
 
                         if (clearpath)
                         {
-                            int intensity = Convert.ToInt32(Vector3.Dot(intersectedObject.plane.normal.Unit(), (light.location - p).Unit()) * light.intensity);
+                            int intensity = Convert.ToInt32(Vector3.Dot(intersectedObject.plane.normal.Unit(), (light.location - p).Unit()) * light.intensity / (light.location - p).Magnitude());
                             bitmap.SetPixel(x, y, Color.FromArgb(intensity, intensity, intensity));
                         }
                     }
@@ -87,7 +92,6 @@ namespace WrayTrace
 
             bitmap.Save("img.bmp");
         }
-
         static Vector3 V(float x0, float y0, float z0)
         {
             return new Vector3(x0, y0, z0);
@@ -103,6 +107,17 @@ namespace WrayTrace
         {
             location = location0;
             sensor = sensor0;
+        }
+
+        public Camera(Vector3 location0, Vector3 direction, float width, int pWidth, int pHeight)
+        {
+            location = location0;
+            float height = width / pWidth * pHeight;
+            Vector3 center = location + direction;
+            Vector3 hOffset = Vector3.Normal(direction, new Vector3(0, 0, 1)).Unit() * width / 2;
+            Vector3 vOffset = Vector3.Normal(direction, hOffset).Unit() * height / 2;
+            Parallelogram border = new Parallelogram(center - hOffset - vOffset, center - hOffset + vOffset, center + hOffset + vOffset);
+            sensor = new Sensor(border, pWidth, pHeight);
         }
     }
 
