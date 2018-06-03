@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using Vector;
 using Geometry;
+using System.Diagnostics;
 
 namespace WrayTrace
 {
@@ -13,6 +14,12 @@ namespace WrayTrace
     {
         static void Main(string[] args)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+
+            Console.Write("Generating Scene...");
+
             int width = 1920;
             int height = 1080;
 
@@ -28,6 +35,9 @@ namespace WrayTrace
 
             Parallelogram floor = new Parallelogram(V(-10, 10, 0), V(-10, -10, 0), V(10, -10, 0));
             Paralleloid cube = new Paralleloid(V(1, 1, 0), V(1, -1, 0), V(-1, 1, 0), V(1, 1, 2));
+            Paralleloid scube = new Paralleloid(V(0.866025404f, 0.5f, 2), V(0.5f, -0.866025404f, 2), V(-0.5f, 0.866025404f, 2), V(0.866025404f, 0.5f, 3.41f));
+
+            Console.Write("\rGenerating Scene [Done - {0}s]\r\n", 0.001 * stopwatch.ElapsedMilliseconds);
 
             Triangle[] elements = {
                 floor.A, floor.B,
@@ -36,13 +46,20 @@ namespace WrayTrace
                 cube.faces[2].A, cube.faces[2].B,
                 cube.faces[3].A, cube.faces[3].B,
                 cube.faces[4].A, cube.faces[4].B,
-                cube.faces[5].A, cube.faces[5].B
+                cube.faces[5].A, cube.faces[5].B,
+                scube.faces[0].A, scube.faces[0].B,
+                scube.faces[1].A, scube.faces[1].B,
+                scube.faces[2].A, scube.faces[2].B,
+                scube.faces[3].A, scube.faces[3].B,
+                scube.faces[4].A, scube.faces[4].B,
+                scube.faces[5].A, scube.faces[5].B
             };
 
-            Light light = new Light(new Vector3(10, -7, 15), 5000);
+            Light light = new Light(new Vector3(20, -14, 30), 5000);
 
             for (var x = 0; x < width; x++)
             {
+                Console.Write("\rRendering Image [{0}%]", Math.Floor(100.0f * x / width));
                 for (var y = 0; y < height; y++)
                 {
                     Line ray = new Line(camera.location, camera.sensor.LocatePixel(x, y) - camera.location);
@@ -90,7 +107,11 @@ namespace WrayTrace
                 }
             }
 
+            Console.Write("\rGenerating Image [Done - {0}s]\n\r", 0.001 * stopwatch.ElapsedMilliseconds);
+            Console.Write("Saving Image...");
+
             bitmap.Save("img.bmp");
+            Console.Write("\rSaving Image [Done - {0}s]\n\r", 0.001 * stopwatch.ElapsedMilliseconds);
         }
         static Vector3 V(float x0, float y0, float z0)
         {
