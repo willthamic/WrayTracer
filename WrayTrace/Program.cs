@@ -7,7 +7,10 @@ using System.Drawing;
 using Vector;
 using Geometry;
 using System.Diagnostics;
+<<<<<<< HEAD
 using System.Threading;
+=======
+>>>>>>> 3d722d75aa25c13139b2954b3d213ddf2039c2b9
 
 namespace WrayTrace
 {
