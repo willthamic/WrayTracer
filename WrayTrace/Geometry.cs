@@ -1,8 +1,47 @@
 ﻿using System;
+using System.Threading;
 using Vector;
 
 namespace Geometry
 {
+    public class RayTriangle
+    {
+        public static (bool, Vector3, float) W (Triangle triangle, Line line)
+        {
+            (bool, Vector3, float) raycast = Plane.RayCast(line, triangle.plane);
+            Vector3 p = raycast.Item2;
+            if (p == null)
+                return (false, null, 0);
+            float i = (float)Math.Acos(Vector3.Dot((triangle.a - p).Unit(), (triangle.b - p).Unit()));
+            float j = (float)Math.Acos(Vector3.Dot((triangle.b - p).Unit(), (triangle.c - p).Unit()));
+            float k = (float)Math.Acos(Vector3.Dot((triangle.c - p).Unit(), (triangle.a - p).Unit()));
+            if (i + j + k > 2 * Math.PI - 0.001 || i + j + k == float.NaN)
+                return (true, p, raycast.Item3);
+            else
+                return (false, null, 0);
+        }
+
+        public static (bool, Vector3, float) IO (Triangle triangle, Line line)
+        {
+            (bool, Vector3, float) raycast = Plane.RayCast(line, triangle.plane);
+            Vector3 p = raycast.Item2;
+            if (p == null)
+                return (false, null, 0);
+            Vector3 edgeA = triangle.b - triangle.a;
+            Vector3 edgeB = triangle.c - triangle.b;
+            Vector3 edgeC = triangle.a - triangle.c;
+            Vector3 ap = p - triangle.a;
+            Vector3 bp = p - triangle.b;
+            Vector3 cp = p - triangle.c;
+            if (Vector3.Dot(triangle.plane.normal, Vector3.Normal(edgeA, ap)) > 0 &&
+                Vector3.Dot(triangle.plane.normal, Vector3.Normal(edgeB, bp)) > 0 &&
+                Vector3.Dot(triangle.plane.normal, Vector3.Normal(edgeC, cp)) > 0)
+                return (true, p, raycast.Item3);
+            else
+                return (false, null, 0);
+        }
+    }
+
     /// <summary>
     /// Represents a triangle defined by three points in 3-dimensions.
     /// </summary>
@@ -19,24 +58,6 @@ namespace Geometry
             b = b0;
             c = c0;
             plane = new Plane(a, b - a, c - a);
-        }
-
-        /// <summary>
-        /// Finds the intersection of the triangle and a specified line.
-        /// </summary>
-        public (bool, Vector3, float) FindIntersect(Line line)
-        {
-            (bool, Vector3, float) raycast = Plane.RayCast(line, plane);
-            Vector3 p = raycast.Item2;
-            if (p == null)
-                return (false, null, 0);
-            float i = (float) Math.Acos(Vector3.Dot((a - p).Unit(), (b - p).Unit()));
-            float j = (float) Math.Acos(Vector3.Dot((b - p).Unit(), (c - p).Unit()));
-            float k = (float) Math.Acos(Vector3.Dot((c - p).Unit(), (a - p).Unit()));
-            if (i + j + k > 2 * Math.PI - 0.0001 || i + j + k == float.NaN)
-                return (true, p, raycast.Item3);
-            else
-                return (false, null, 0);
         }
     }
 
@@ -83,21 +104,6 @@ namespace Geometry
         public static Parallelogram operator +(Vector3 vector, Parallelogram parallelogram)
         {
             return parallelogram.Translate(vector);
-        }
-
-        /// <summary>
-        /// Finds the intersection of the parallelogram and a specified line.
-        /// </summary>
-        public (bool, Vector3, float) FindIntersect(Line line)
-        {
-            (bool, Vector3, float) aIntersect = A.FindIntersect(line);
-            (bool, Vector3, float) bIntersect = B.FindIntersect(line);
-            if (aIntersect.Item1)
-                return (true, aIntersect.Item2, aIntersect.Item3);
-            else if (bIntersect.Item1)
-                return (true, bIntersect.Item2, bIntersect.Item3);
-            else
-                return (false, null, 0);
         }
     }
 
