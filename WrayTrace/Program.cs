@@ -20,8 +20,8 @@ namespace WrayTrace
 
             Console.Write("Generating Scene...");
 
-            int width = 1920;
-            int height = 1080;
+            int width = 1200;
+            int height = 800;
 
             String raycastMethod = "IO";
 
@@ -45,6 +45,7 @@ namespace WrayTrace
             Paralleloid cube2 = new Paralleloid(V(0.866025404f, 0.5f, 2), V(0.5f, -0.866025404f, 2), V(-0.5f, 0.866025404f, 2), V(0.866025404f, 0.5f, 3.41f));
 
             Light light1 = new Light(new Vector3(20, -14, 30), 5000);
+            Light light2 = new Light(new Vector3(15, -14, 30), 5000);
 
 
             List<Object> elements0 = new List<Object>();
@@ -53,7 +54,12 @@ namespace WrayTrace
             elements0.Add(cube2);
 
             List<Object> lights = new List<Object>();
-            lights.Add(light1);
+            for (var i = 0; i <= 10; i++)
+            {
+                for (var j = 0; j <= 10; j++) {
+                    lights.Add(new Light(new Vector3(2 * i - 10, 2 * i - 10, 100), 1));
+                }
+            }
 
             Triangle[] elements = {
                 floor.A, floor.B,
