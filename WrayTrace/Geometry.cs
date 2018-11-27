@@ -6,7 +6,7 @@ namespace Geometry
 {
     public interface Element
     {
-        (bool, Vector3, float, Vector3) Raycast(Line line, String type);
+        (bool, Vector3, float, Vector3) Raycast(Line line);
     }
 
     /// <summary>
@@ -35,15 +35,18 @@ namespace Geometry
             plane = new Plane(a, b - a, c - a);
         }
 
-        public (bool, Vector3, float, Vector3) Raycast(Line line, String type)
+        public (bool, Vector3, float, Vector3) Raycast(Line line)
         {
-            return TriangleRaycast(this, line, type);
+            return TriangleRaycast(this, line);
         }
 
-        static (bool, Vector3, float, Vector3) TriangleRaycast(Triangle element, Line line, String type)
+        static (bool, Vector3, float, Vector3) TriangleRaycast(Triangle element, Line line)
         {
+            String type = "IO";
             if (type == "IO")
                 return IO(element, line);
+            else if (type == "MT")
+                return MT(element, line);
             else
                 return W(element, line);
         }
@@ -69,6 +72,7 @@ namespace Geometry
             Vector3 p = raycast.Item2;
             if (p == null)
                 return (false, null, 0, null);
+
             Vector3 ap = p - triangle.a;
             Vector3 bp = p - triangle.b;
             Vector3 cp = p - triangle.c;
@@ -76,6 +80,33 @@ namespace Geometry
                 Vector3.Dot(triangle.plane.normal, Vector3.Normal(triangle.bc, bp)) > 0 &&
                 Vector3.Dot(triangle.plane.normal, Vector3.Normal(triangle.ca, cp)) > 0)
                 return (true, p, raycast.Item3, triangle.plane.normal);
+            else
+                return (false, null, 0, null);
+        }
+
+        static (bool, Vector3, float, Vector3) MT(Triangle triangle, Line line)
+        {
+            const float epsilon = 0.00001f;
+            Vector3 ab = triangle.b - triangle.a;
+            Vector3 ac = triangle.c - triangle.a;
+            Vector3 pVec = Vector3.Normal(line.direction, ac);
+            float det = Vector3.Dot(ab, pVec);
+
+            if (det > -epsilon && det < epsilon)
+                return (false, null, 0, null);
+
+            float f = 1.0f / det;
+            Vector3 s = line.origin - triangle.a;
+            float u = f * Vector3.Dot(s, pVec);
+
+            if (u < 0.0 || u > 1.0)
+                return (false, null, 0, null);
+
+            Vector3 q = Vector3.Normal(s, ab);
+            float t = f * Vector3.Dot(ac, q);
+
+            if (t > epsilon)
+                return (true, line.origin + t * line.direction, t, triangle.plane.normal);
             else
                 return (false, null, 0, null);
         }
@@ -124,13 +155,13 @@ namespace Geometry
             return parallelogram.Translate(vector);
         }
 
-        public (bool, Vector3, float, Vector3) Raycast(Line line, String type)
+        public (bool, Vector3, float, Vector3) Raycast(Line line)
         {
-            var temp = this.A.Raycast(line, type);
+            var temp = this.A.Raycast(line);
             if (temp.Item1)
                 return temp;
             else
-                return this.B.Raycast(line, type);
+                return this.B.Raycast(line);
         }
     }
 
@@ -158,12 +189,12 @@ namespace Geometry
             faces[5] = faces[2] + (points[4] - points[0]);
         }
 
-        public (bool, Vector3, float, Vector3) Raycast(Line line, String type)
+        public (bool, Vector3, float, Vector3) Raycast(Line line)
         {
             (bool, Vector3, float, Vector3) intersect = (false, null, 0, null);
             foreach (Parallelogram parallelogram in faces)
             {
-                var temp = parallelogram.Raycast(line, type);
+                var temp = parallelogram.Raycast(line);
                 if (temp.Item1 && temp.Item3 > 0 && (!intersect.Item1 || temp.Item3 < intersect.Item3))
                     intersect = temp;
             }
