@@ -7,11 +7,9 @@ using System.Drawing;
 using Vector;
 using Geometry;
 using System.Diagnostics;
-using System.Threading;
 
 namespace WrayTrace
 {
-            /*
     class WrayTrace
     {
         static void Main(string[] args)
@@ -44,8 +42,8 @@ namespace WrayTrace
             Paralleloid cube = new Paralleloid(V(1, 1, 0), V(1, -1, 0), V(-1, 1, 0), V(1, 1, 2));
             Paralleloid cube2 = new Paralleloid(V(0.866025404f, 0.5f, 2), V(0.5f, -0.866025404f, 2), V(-0.5f, 0.866025404f, 2), V(0.866025404f, 0.5f, 3.41f));
 
-            Light light1 = new Light(new Vector3(20, -14, 30), 4000);
-            Light light2 = new Light(new Vector3(15, -14, 30), 5000);
+            Light light1 = new PointLight(new Vector3(20, -14, 30), 4000);
+            Light light2 = new PointLight(new Vector3(15, -14, 30), 5000);
 
 
             List<Element> elements0 = new List<Element>();
@@ -57,8 +55,6 @@ namespace WrayTrace
             lights.Add(light1);
 
             Console.Write("\rGenerating Scene [Done - {0}s]\r\n", 0.001 * stopwatch.ElapsedMilliseconds);
-
-            int count = 0;
 
             Scene scene = new Scene(camera);
             scene.elements = elements0;
@@ -87,9 +83,8 @@ namespace WrayTrace
             return new Vector3(x0, y0, z0);
         }
     }
-    */
 
-    public class Scene
+    class Scene
     {
         public Camera camera;
         public List<Light> lights;
@@ -104,17 +99,16 @@ namespace WrayTrace
             height = camera.sensor.pHeight;
         }
 
-        public Color[,] Render(ref String status)
+        public Color[,] Render()
         {
             Color[,] imageColors = new Color[width, height];
-            float [,] imageValues = GetIntensityValues(ref status);
+            float [,] imageValues = GetIntensityValues();
             float maxIntensity = (from float v in imageValues select v).Max();
 
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    
                     int intensity = Convert.ToInt32(imageValues[x, y] / maxIntensity * 255);
                     imageColors[x, y] = Color.FromArgb(intensity, intensity, intensity);
                 }
@@ -122,19 +116,15 @@ namespace WrayTrace
             return imageColors;
         }
 
-        public float[,] GetIntensityValues(ref String status)
+        public float[,] GetIntensityValues()
         {
             float[,] intensityValues = new float[width, height];
-
-            for (int i = 0; i < width*height; i++)
-            //Parallel.For(0, width * height, (i) =>
+            Parallel.For(0, width * height, (i) =>
             {
                 int xIndex = i % width;
                 int yIndex = i / width;
                 intensityValues[xIndex, yIndex] = GetPixelIntensity(xIndex, yIndex);
-                status = 100.0 * i / (width * height) + "%";
-            }
-            //);
+            });
             return intensityValues;
         }
 
@@ -169,22 +159,7 @@ namespace WrayTrace
             if (intersectedObject != null) {
                 foreach (Light light in lights)
                 {
-                    bool clearpath = true;
-
-                    foreach (Element element in elements)
-                    {
-                        //if (element == intersectedObject)
-                        //    continue;
-                        var intersect = element.Raycast(new Line(p, light.location - p));
-
-                        if (intersect.Item1 && intersect.Item3 > 0)
-                        {
-                            clearpath = false;
-                            break;
-                        }
-
-                    }
-                    if (clearpath)
+                    if (checkClearPath(elements, camera.location, p, light.location))
                     {
                         intensity += Math.Abs(light.GetIntensity(surfaceNormal, p));
                     }
@@ -192,9 +167,22 @@ namespace WrayTrace
             }
             return intensity;
         }
+
+        public bool checkClearPath(List<Element> elements, Vector3 a, Vector3 b, Vector3 c)
+        {
+            if (Vector3.Dot(b - a, c - b) < 0) return false;
+            bool clearPath = true;
+
+            foreach (Element element in elements)
+            {
+                
+
+            }
+            return clearPath;
+        }
     }
     
-    public class Camera
+    class Camera
     {
         public Vector3 location;
         public Sensor sensor;
@@ -217,7 +205,7 @@ namespace WrayTrace
         }
     }
 
-    public class Sensor
+    class Sensor
     {
         Geometry.Parallelogram border;
         public int pWidth;
@@ -239,12 +227,17 @@ namespace WrayTrace
         }
     }
 
-    public class Light
+    interface Light
+    {
+        float GetIntensity(Vector3 surfaceNormal, Vector3 p);
+    }
+
+    class PointLight : Light
     {
         public Vector3 location;
         public float intensity;
 
-        public Light(Vector3 location0, float intensity0)
+        public PointLight(Vector3 location0, float intensity0)
         {
             location = location0;
             intensity = intensity0;
@@ -256,16 +249,26 @@ namespace WrayTrace
         }
     }
 
-    public class Spotlight : Light
+    class Spotlight : Light
     {
+        Vector3 location;
+        float intensity;
         float minAngle;
         float maxAngle;
         float minCosAngle;
         float maxCosAngle;
 
-        public Spotlight(Vector3 location0, float intensity0, float angle) : this(location0, intensity0, angle, angle) {}
+        public Spotlight(Vector3 location0, float intensity0, float angle)
+        {
+            location = location0;
+            intensity = intensity0;
+            minAngle = 0;
+            maxAngle = angle;
+            minCosAngle = (float)Math.Cos(minAngle);
+            maxCosAngle = (float)Math.Cos(maxAngle);
+        }
 
-        public Spotlight(Vector3 location0, float intensity0, float minAngle0, float maxAngle0) : base(location0, intensity0)
+        public Spotlight(Vector3 location0, float intensity0, float minAngle0, float maxAngle0)
         {
             location = location0;
             intensity = intensity0;
@@ -273,6 +276,11 @@ namespace WrayTrace
             maxAngle = maxAngle0;
             minCosAngle = (float) Math.Cos(minAngle);
             maxCosAngle = (float) Math.Cos(maxAngle);
+        }
+
+        public float GetIntensity(Vector3 surfaceNormal, Vector3 p)
+        {
+            return 0f;
         }
     }
 }
