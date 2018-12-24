@@ -201,4 +201,87 @@ namespace Geometry
             return intersect;
         }
     }
+
+    public class Sphere : Element
+    {
+        Vector3 center;
+        float radius;
+
+        public Sphere (Vector3 center, float radius)
+        {
+            this.center = center;
+            this.radius = radius;
+        }
+
+
+        public (bool, Vector3, float, Vector3) Raycast(Line line)
+        {
+            // 0 = (x - center.x) ^ 2 + (y - center.y) ^ 2 + (z - center.z) ^ 2 - radius^2;
+            // x = line.origin.x + line.direction.x * t;
+            // y = line.origin.y + line.direction.y * t;
+            // z = line.origin.z + line.direction.z * t;
+            
+            // 0 = (line.origin.x + line.direction.x * t - center.x) ^ 2 + (line.origin.y + line.direction.y * t - center.y) ^ 2 + (line.origin.z + line.direction.z * t - center.z) ^ 2 - radius^2;
+
+            Vector3 a = line.origin - center;
+            Vector3 b = line.direction;
+
+            // 0 = (a.x + b.x * t) ^ 2 + (a.y + b.y * t) ^ 2 + (a.z + b.z * t) ^ 2 - radius^2;
+
+            // 0 = a.x * a.x + 2 * a.x * b.x * t + b.x * b.x * t * t
+            //   + a.y * a.y + 2 * a.y * b.y * t + b.y * b.y * t * t
+            //   + a.z * a.z + 2 * a.z * b.z * t + b.z * b.z * t * t
+            //   - radius^2
+
+            // 0 = A + B * t + C * t^2
+            //float A = a.x * a.x + a.y + a.y + a.z + a.z - radius * radius;
+            //float B = 2 * a.x * b.x + 2 * a.y * b.y + 2 * a.z * b.z;
+            //float C = b.x * b.x + b.y * b.y + b.z * b.z;
+
+            float A = Vector3.Dot(b, b);
+            float B = 2 * Vector3.Dot(a, b);
+            float C = Vector3.Dot(a, a) - radius * radius;
+
+            float descr = B * B - 4 * A * C;
+            if (descr >= 0)
+            {
+                float sqrtDescr = (float)Math.Sqrt(descr);
+                float t1 = (-B + sqrtDescr) / (2 * A) - 0.000001f;
+                float t2 = (-B - sqrtDescr) / (2 * A) - 0.000001f;
+
+                if (t1 > 0 && t2 > 0 )
+                {
+                    if (t1 < t2)
+                    {
+                        Vector3 p = line.origin + line.direction * t1;
+                        return (true, p, t1, p - center);
+                    }
+                    else
+                    {
+                        Vector3 p = line.origin + line.direction * t2;
+                        return (true, p, t2, p - center);
+                    }
+                }
+                else if (t1 > 0 && t2 <= 0)
+                {
+                    Vector3 p = line.origin + line.direction * t1;
+                    return (true, p, t1, p - center);
+                }
+                else if (t1 <= 0 && t2 > 0)
+                {
+                    Vector3 p = line.origin + line.direction * t2;
+                    return (true, p, t2, p - center);
+                }
+                else
+                {
+                    return (false, null, 0, null);
+                }
+            }
+            else
+            {
+                return (false, null, 0, null);
+            }
+
+        }
+    }
 }

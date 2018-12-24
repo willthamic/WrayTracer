@@ -126,14 +126,14 @@ namespace WrayTrace
         {
             float[,] intensityValues = new float[width, height];
 
-            //for (int i = 0; i < width*height; i++)
-            Parallel.For(0, width * height, (i) =>
+            for (int i = 0; i < width*height; i++)
+            //Parallel.For(0, width * height, (i) =>
             {
                 int xIndex = i % width;
                 int yIndex = i / width;
                 intensityValues[xIndex, yIndex] = GetPixelIntensity(xIndex, yIndex);
             }
-            );
+            //);
             return intensityValues;
         }
 
