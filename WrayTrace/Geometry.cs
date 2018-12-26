@@ -24,11 +24,11 @@ namespace Geometry
         public Vector3 ca;
         public Plane plane;
         
-        public Triangle(Vector3 a0, Vector3 b0, Vector3 c0)
+        public Triangle(Vector3 a, Vector3 b, Vector3 c)
         {
-            a = a0;
-            b = b0;
-            c = c0;
+            this.a = a;
+            this.b = b;
+            this.c = c;
 
             ab = b - a;
             bc = c - b;
@@ -135,11 +135,11 @@ namespace Geometry
 
         public Plane plane;
 
-        public Parallelogram(Vector3 p1, Vector3 p2, Vector3 p3)
+        public Parallelogram(Vector3 origin, Vector3 v, Vector3 u)
         {
-            a = p1;
-            b = p2;
-            c = p3;
+            a = origin;
+            b = v;
+            c = u;
 
             d = a + c - b;
 
@@ -184,16 +184,16 @@ namespace Geometry
         public Vector3[] points = new Vector3[8];
         public Parallelogram[] faces = new Parallelogram[6];
 
-        public Parallelepiped (Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
+        public Parallelepiped (Vector3 origin, Vector3 v, Vector3 u, Vector3 w)
         {
-            points[0] = p1;
-            points[1] = p2;
-            points[2] = p2 + (p3 - p1);
-            points[3] = p3;
-            points[4] = p4;
-            points[5] = p4 + (p2 - p1);
-            points[6] = points[5] + (p3 - p1);
-            points[7] = p3 + (p4 - p1);
+            points[0] = origin;
+            points[1] = v;
+            points[2] = v + (u - origin);
+            points[3] = u;
+            points[4] = w;
+            points[5] = w + (v - origin);
+            points[6] = points[5] + (u - origin);
+            points[7] = u + (w - origin);
 
             faces[0] = new Parallelogram(points[1], points[0], points[4]);
             faces[1] = new Parallelogram(points[3], points[0], points[4]);
