@@ -7,6 +7,8 @@ namespace Geometry
     public interface Element
     {
         (bool, Vector3, float, Vector3) Raycast(Line line);
+
+        bool SimpleRaycast(Line line);
     }
 
     /// <summary>
@@ -38,6 +40,12 @@ namespace Geometry
         public (bool, Vector3, float, Vector3) Raycast(Line line)
         {
             return TriangleRaycast(this, line);
+        }
+
+        public bool SimpleRaycast(Line line)
+        {
+            var temp = Raycast(line);
+            return temp.Item1 && (temp.Item3 > 0);
         }
 
         static (bool, Vector3, float, Vector3) TriangleRaycast(Triangle element, Line line)
@@ -163,14 +171,20 @@ namespace Geometry
             else
                 return this.B.Raycast(line);
         }
+
+        public bool SimpleRaycast(Line line)
+        {
+            var temp = Raycast(line);
+            return temp.Item1 && (temp.Item3 > 0);
+        }
     }
 
-    public class Paralleloid : Element
+    public class Parallelepiped : Element
     {
         public Vector3[] points = new Vector3[8];
         public Parallelogram[] faces = new Parallelogram[6];
 
-        public Paralleloid (Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
+        public Parallelepiped (Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
         {
             points[0] = p1;
             points[1] = p2;
@@ -200,7 +214,27 @@ namespace Geometry
             }
             return intersect;
         }
+
+        public bool SimpleRaycast(Line line)
+        {
+            return Raycast(line).Item1;
+        }
     }
+
+    public class Cube : Element
+    {
+        public (bool, Vector3, float, Vector3) Raycast(Line line)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool SimpleRaycast(Line line)
+        {
+            var temp = Raycast(line);
+            return temp.Item1 && (temp.Item3 > 0);
+        }
+    }
+
 
     public class Sphere : Element
     {
@@ -282,6 +316,19 @@ namespace Geometry
                 return (false, null, 0, null);
             }
 
+        }
+
+        public bool SimpleRaycast(Line line)
+        {
+            Vector3 a = line.origin - center;
+            Vector3 b = line.direction;
+
+            float A = Vector3.Dot(b, b);
+            float B = 2 * Vector3.Dot(a, b);
+            float C = Vector3.Dot(a, a) - radius * radius;
+
+            float descr = B * B - 4 * A * C;
+            return (descr >= 0) && (((-B + Math.Sqrt(descr)) / (2 * A) - 0.000001f) > 0 || ((-B + Math.Sqrt(descr)) / (2 * A) - 0.000001f) > 0);
         }
     }
 }

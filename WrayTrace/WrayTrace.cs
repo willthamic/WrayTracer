@@ -114,7 +114,6 @@ namespace WrayTrace
             {
                 for (int y = 0; y < height; y++)
                 {
-                    
                     int intensity = Convert.ToInt32(imageValues[x, y] / maxIntensity * 255);
                     imageColors[x, y] = Color.FromArgb(intensity, intensity, intensity);
                 }
@@ -174,9 +173,9 @@ namespace WrayTrace
                     {
                         //if (element == intersectedObject)
                         //    continue;
-                        var intersect = element.Raycast(new Line(p, light.location - p));
+                        var intersect = element.SimpleRaycast(new Line(p, light.location - p));
 
-                        if (intersect.Item1 && intersect.Item3 > 0)
+                        if (intersect)
                         {
                             clearpath = false;
                             break;
