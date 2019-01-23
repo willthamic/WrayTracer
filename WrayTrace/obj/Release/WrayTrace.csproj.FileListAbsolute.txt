@@ -1,0 +1,12 @@
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Release\WrayTrace.dll.config
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Release\WrayTrace.dll
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Release\WrayTrace.pdb
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Release\System.ValueTuple.dll
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Release\Vector.dll
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Release\System.ValueTuple.xml
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\bin\Release\Vector.pdb
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Release\WrayTrace.csprojAssemblyReference.cache
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Release\WrayTrace.csproj.CoreCompileInputs.cache
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Release\WrayTrace.csproj.CopyComplete
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Release\WrayTrace.dll
+C:\Users\Will\OneDrive\Mine\Code\C#\WrayTrace\WrayTrace\obj\Release\WrayTrace.pdb

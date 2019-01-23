@@ -23,7 +23,7 @@ namespace Geometry
         public Vector3 bc;
         public Vector3 ca;
         public Plane plane;
-        
+
         public Triangle(Vector3 a, Vector3 b, Vector3 c)
         {
             this.a = a;
@@ -223,13 +223,47 @@ namespace Geometry
 
     public class Cube : Element
     {
+
+        public Vector3 center;
+        public float radius;
+        public float theta;
+        public float phi;
+
+        public Sphere inside;
+        public Sphere outside;
+        public Parallelepiped self;
+            
+
+        public Cube (Vector3 center, float side)
+        {
+            this.center = center;
+            this.radius = side / 2;
+            theta = 0;
+            phi = 0;
+            inside = new Sphere(center, radius);
+            outside = new Sphere(center, radius * (float) Math.Sqrt(3));
+            self = new Parallelepiped(center - new Vector3(radius, radius, radius), new Vector3(2*radius, 0, 0), new Vector3(0, 2 * radius, 0), new Vector3(0, 0, 2 * radius));
+        }
+
         public (bool, Vector3, float, Vector3) Raycast(Line line)
         {
-            throw new NotImplementedException();
+            //if (outside.SimpleRaycast(line) == false)
+            //    return (false, null, 0, null);
+
+            if (theta == 0 && phi == 0)
+            {
+                
+                return (false, null, 0, null);
+            }
+
+            return (false, null, 0, null); // TO BE FIXED
         }
 
         public bool SimpleRaycast(Line line)
         {
+            //if (inside.SimpleRaycast(line))
+            //    return true;
+
             var temp = Raycast(line);
             return temp.Item1 && (temp.Item3 > 0);
         }

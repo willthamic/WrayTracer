@@ -11,84 +11,6 @@ using System.Threading;
 
 namespace WrayTrace
 {
-            /*
-    class WrayTrace
-    {
-        static void Main(string[] args)
-        { 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            Console.Write("Generating Scene...");
-
-            int width = 1920/4;
-            int height = 1080/4;
-
-            Bitmap image = new Bitmap(width, height);
-            float[,] imageValues = new float[width, height];
-            //for (int x = 0; x < width; x++)
-            //{
-            //    for (int y = 0; y < height; y++)
-            //    {
-            //        image.SetPixel(x, y, Color.Black);
-            //    }
-            //}
-
-            //Parallelogram sensorBorder = new Parallelogram(V(-1, -4, 4), V(-1, -4, 2), V(1, -4, 2));
-            //Sensor sensor = new Sensor(sensorBorder, width, height);
-            //Camera camera = new Camera(V(-2, 4, 4) * 1.5f, V(.5f, -1, -.75f).Unit(), 1.2f, width, height);
-            Camera camera = new Camera(V(2, -4, 4) * 1.5f, V(-.5f, 1, -.75f).Unit(), 1.2f, width, height);
-            //Camera camera = new Camera(V(0, 0, 2), V(0.1f, 0, -1), 1.2f, width, height);
-
-            Parallelogram floor = new Parallelogram(V(-10, 10, 0), V(-10, -10, 0), V(10, -10, 0));
-            Paralleloid cube = new Paralleloid(V(1, 1, 0), V(1, -1, 0), V(-1, 1, 0), V(1, 1, 2));
-            Paralleloid cube2 = new Paralleloid(V(0.866025404f, 0.5f, 2), V(0.5f, -0.866025404f, 2), V(-0.5f, 0.866025404f, 2), V(0.866025404f, 0.5f, 3.41f));
-
-            Light light1 = new Light(new Vector3(20, -14, 30), 4000);
-            Light light2 = new Light(new Vector3(15, -14, 30), 5000);
-
-
-            List<Element> elements0 = new List<Element>();
-            elements0.Add(floor);
-            elements0.Add(cube);
-            elements0.Add(cube2);
-
-            List<Light> lights = new List<Light>();
-            lights.Add(light1);
-
-            Console.Write("\rGenerating Scene [Done - {0}s]\r\n", 0.001 * stopwatch.ElapsedMilliseconds);
-
-            int count = 0;
-
-            Scene scene = new Scene(camera);
-            scene.elements = elements0;
-            scene.lights = lights;
-
-            var imageColors = scene.Render();
-
-
-            Console.Write("\rGenerating Image [Done - {0}s]\n\r", 0.001 * stopwatch.ElapsedMilliseconds);
-            Console.Write("Saving Image...");
-
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    image.SetPixel(x, y, imageColors[x, y]);
-                }
-            }
-
-            image.Save("img.bmp");
-            Console.Write("\rSaving Image [Done - {0}s]\n\r", 0.001 * stopwatch.ElapsedMilliseconds);
-        }
-
-        static Vector3 V(float x0, float y0, float z0)
-        {
-            return new Vector3(x0, y0, z0);
-        }
-    }
-    */
-
     public class Scene
     {
         public Camera camera;
@@ -104,10 +26,10 @@ namespace WrayTrace
             height = camera.sensor.pHeight;
         }
 
-        public Color[,] Render(ref String status)
+        public Color[,] Render()
         {
             Color[,] imageColors = new Color[width, height];
-            float [,] imageValues = GetIntensityValues(ref status);
+            float [,] imageValues = GetIntensityValues();
             float maxIntensity = (from float v in imageValues select v).Max();
 
             for (int x = 0; x < width; x++)
@@ -121,7 +43,7 @@ namespace WrayTrace
             return imageColors;
         }
 
-        public float[,] GetIntensityValues(ref String status)
+        public float[,] GetIntensityValues()
         {
             float[,] intensityValues = new float[width, height];
 
